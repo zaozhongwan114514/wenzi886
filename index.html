@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>启元 & 怡怡 · 导航</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            min-height: 100vh;
+            background-color: #080c18;
+            overflow: hidden;
+            font-family: "思源黑体", system-ui, -apple-system, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #cbd5e1;
+        }
+        #starfield{
+            position: fixed;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            z-index: 0;
+            opacity:0;
+            transition: opacity 1.5s ease-in-out;
+        }
+        .nav-card {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 48px 40px;
+            max-width: 420px;
+            width: calc(100% - 40px);
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(148, 163, 184, 0.12);
+            border-radius: 16px;
+            backdrop-filter: blur(12px);
+            opacity:0;
+            transform: translateY(12px);
+            transition: all 1s ease;
+        }
+        .nav-card.show{
+            opacity:1;
+            transform: translateY(0);
+        }
+        .nav-card h1{
+            font-size:24px;
+            font-weight: 400;
+            margin-bottom:12px;
+            color:#e2e8f0;
+            letter-spacing:2px;
+        }
+        .desc{
+            font-size:14px;
+            color:#94a3b8;
+            margin-bottom:36px;
+            line-height:1.7;
+        }
+        .nav-item{
+            display:block;
+            text-decoration:none;
+            color:#cbd5e1;
+            padding:14px 20px;
+            margin:12px 0;
+            border:1px solid rgba(148,163,184,0.2);
+            border-radius:10px;
+            font-size:16px;
+            transition: 0.3s ease;
+        }
+        .nav-item:hover{
+            border-color:#ecb6ca;
+            background:rgba(236, 182, 202, 0.08);
+            color:#f0c8d6;
+        }
+        .back-tip{
+            margin-top:28px;
+            font-size:13px;
+            opacity:0.45;
+        }
+    </style>
+</head>
+<body>
+<canvas id="starfield"></canvas>
+
+<div class="nav-card" id="navWrap">
+    <h1>启元 & 怡怡</h1>
+    <div class="desc">属于我们的星空纪念</div>
+
+    <a href="yifengxin.html" class="nav-item">✉️ 阅读那封信</a>
+    <a href="jishiqi.html" class="nav-item">💞 相恋计时纪念页</a>
+
+    <div class="back-tip">愿星空见证我们的时光</div>
+</div>
+
+<script>
+const canvas = document.getElementById('starfield');
+const ctx = canvas.getContext('2d');
+let w,h,stars = [];
+let meteors = [];
+
+function resize(){
+    w = canvas.width = innerWidth;
+    h = canvas.height = innerHeight;
+}
+resize();
+window.addEventListener('resize',resize);
+
+for(let i=0;i<350;i++){
+    stars.push({
+        x:Math.random()*w,
+        y:Math.random()*h,
+        r:Math.random()*1.2+0.2,
+        speed:Math.random()*0.25+0.05
+    })
+}
+
+function spawnMeteor(){
+    meteors.push({
+        x: Math.random() * w * 0.4 + w*0.6,
+        y: Math.random() * h * 0.3,
+        len: Math.random()*60 + 40,
+        speedX: -1.2,
+        speedY: 1.2,
+        opacity: 1
+    })
+}
+
+function draw(){
+    ctx.fillStyle="#080c18";
+    ctx.fillRect(0,0,w,h);
+    stars.forEach(s=>{
+        ctx.beginPath();
+        ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+        ctx.fillStyle = `rgba(210,225,255,${0.3+Math.random()*0.4})`;
+        ctx.fill();
+        s.y += s.speed;
+        if(s.y>h){
+            s.y = 0;
+            s.x = Math.random()*w;
+        }
+    })
+    for(let i = meteors.length -1; i >=0; i--){
+        let m = meteors[i];
+        ctx.beginPath();
+        ctx.moveTo(m.x, m.y);
+        ctx.lineTo(m.x + m.len, m.y - m.len);
+        ctx.strokeStyle = `rgba(255,255,255,${m.opacity})`;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        m.x += m.speedX;
+        m.y += m.speedY;
+        m.opacity -= 0.008;
+        if(m.opacity <= 0){
+            meteors.splice(i,1);
+        }
+    }
+    requestAnimationFrame(draw);
+}
+draw();
+setInterval(spawnMeteor,4000);
+
+const starfield = document.getElementById("starfield");
+const navWrap = document.getElementById("navWrap");
+window.addEventListener('load',()=>{
+    starfield.style.opacity = "1";
+    setTimeout(()=>{
+        navWrap.classList.add('show');
+    },600);
+})
+</script>
+</body>
+</html>
